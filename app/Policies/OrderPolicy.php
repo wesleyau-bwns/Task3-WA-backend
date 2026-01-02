@@ -10,25 +10,22 @@ use Illuminate\Support\Facades\Log;
 class OrderPolicy
 {
     /**
+     * Determine whether the user can view any orders (e.g. /orders).
+     * Admin only.
+     */
+    public function viewAny(User $authUser): bool
+    {
+        return $authUser->hasRole('admin');
+    }
+
+    /**
      * Admin can view all orders.
      * User can view their own orders.
      * Merchant can view orders belonging to their merchant.
      */
     public function view(User $authUser, Order $order): bool
     {
-        if ($authUser->hasRole('admin')) {
-            return true;
-        }
-
-        if ($authUser->hasRole('user')) {
-            return $order->user_id === $authUser->id;
-        }
-
-        if ($authUser->hasRole('merchant')) {
-            return $order->merchant_id === $authUser->merchant_id;
-        }
-
-        return false;
+        return $authUser->hasRole('admin') || $authUser->id === $order->user_id || $order->merchant_id === $authUser->merchant_id;
     }
 
     /**

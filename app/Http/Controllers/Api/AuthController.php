@@ -90,17 +90,8 @@ class AuthController extends Controller
     public function user(Request $request)
     {
         $user = $request->user();
-
-        return response()->json([
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->getRoleNames()->first(), 
-                'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
-                'merchant_id' => $user->merchant_id ?? null,
-            ],
-        ]);
+        
+        return response()->json($this->userResponse($user));
     }
 
     /**
@@ -139,6 +130,9 @@ class AuthController extends Controller
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
+            'role' => $user->getRoleNames()->first(), 
+            'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
+            'merchant_id' => $user->merchant_id ?? null,
         ];
     }
 }

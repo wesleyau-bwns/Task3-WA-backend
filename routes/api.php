@@ -29,24 +29,14 @@ Route::post('/auth/refresh', [AuthController::class, 'refresh']);
 
 // Protected routes
 Route::middleware('auth:api')->group(function () {
-    // Auth
+    // Auth routes
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/user', [AuthController::class, 'user']);
 
-    // Users
-    Route::apiResource('users', UserController::class)->only(['index', 'show']);
-    Route::get('users/{user}/orders', [UserController::class, 'orders']);
-
-    // Merchants
-    Route::apiResource('merchants', MerchantController::class)->only(['index']);
-    Route::get('merchants/{merchant}/products', [MerchantController::class, 'products']);
-    Route::post('merchants/{merchant}/products', [MerchantController::class, 'addProduct']);
-
-    // Products
-    Route::apiResource('products', ProductController::class)->only(['index', 'show']);
-
-    // Orders
-    Route::apiResource('orders', OrderController::class)->only(['index', 'show', 'store', 'update']);
+    // Role-specific routes
+    Route::prefix('user')->group(base_path('routes/user.php'));
+    Route::prefix('merchant')->group(base_path('routes/merchant.php'));
+    Route::prefix('admin')->group(base_path('routes/admin.php'));
 });
 
 Route::get('/health', function () {
