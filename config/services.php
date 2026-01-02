@@ -26,9 +26,14 @@ return [
     ],
 
     'passport' => [
-        // 'oauth_url' => env('OAUTH_APP_URL', 'http://127.0.0.1:8002'),
-        'password_client_id' => env('PASSPORT_PASSWORD_CLIENT_ID'),
-        'password_client_secret' => env('PASSPORT_PASSWORD_CLIENT_SECRET'),
+        'user-api_client_id' => env('USER_API_CLIENT_ID'),
+        'user-api_client_secret' => env('USER_API_CLIENT_SECRET'),
+
+        'merchant-api_client_id' => env('MERCHANT_API_CLIENT_ID'),
+        'merchant-api_client_secret' => env('MERCHANT_API_CLIENT_SECRET'),
+
+        'admin-api_client_id' => env('ADMIN_API_CLIENT_ID'),
+        'admin-api_client_secret' => env('ADMIN_API_CLIENT_SECRET'),
     ],
 
     'ses' => [

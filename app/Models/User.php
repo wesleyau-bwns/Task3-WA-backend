@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -13,6 +12,8 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     use HasApiTokens, HasRoles, HasFactory, Notifiable;
+
+    protected string $guard_name = 'user-api';
 
     /**
      * The attributes that are mass assignable.
@@ -44,16 +45,4 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-
-    // If the user is a merchant, link to the merchant profile
-    public function merchant()
-    {
-        return $this->hasOne(Merchant::class);
-    }
-
-    // Orders placed by the user
-    public function orders()
-    {
-        return $this->hasMany(Order::class);
-    }
 }

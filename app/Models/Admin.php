@@ -2,30 +2,25 @@
 
 namespace App\Models;
 
+use Laravel\Passport\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class Merchant extends Authenticatable
+class Admin extends Authenticatable
 {
-    use HasApiTokens, HasRoles, HasFactory, Notifiable;
+    use HasApiTokens, HasRoles, Notifiable;
 
-    protected string $guard_name = 'merchant-api';
+    protected string $guard_name = 'admin-api';
 
     protected $fillable = [
         'name',
         'email',
         'password',
-        'store_name',
-        'store_description',
-        'status',
     ];
 
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
     protected $casts = [

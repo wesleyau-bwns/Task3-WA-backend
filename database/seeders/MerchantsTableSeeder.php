@@ -4,21 +4,27 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Merchant;
-use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class MerchantsTableSeeder extends Seeder
 {
     public function run(): void
     {
-        $merchantUser = User::whereHas('roles', fn($q) => $q->where('name', 'merchant'))->first();
+        $role = Role::firstOrCreate([
+            'name' => 'merchant',
+            'guard_name' => 'merchant-api'
+        ]);
 
-        Merchant::firstOrCreate(
-            ['user_id' => $merchantUser->id],
-            [
-                'store_name' => 'Demo Store',
-                'store_description' => 'This is a demo store.',
-                'status' => 'active'
-            ]
-        );
+        $merchant = Merchant::create([
+            'name' => 'Merchant Demo',
+            'email' => 'merchant@example.com',
+            'password' => Hash::make('password123'),
+            'store_name' => 'Demo Store',
+            'store_description' => 'This is a standalone merchant store',
+            'status' => 'active',
+        ]);
+
+        $merchant->assignRole($role);
     }
 }

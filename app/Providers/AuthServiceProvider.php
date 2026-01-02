@@ -20,8 +20,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        User::class => UserPolicy::class,
-        Order::class => OrderPolicy::class,
+        // 
     ];
 
     /**
@@ -32,8 +31,8 @@ class AuthServiceProvider extends ServiceProvider
         Passport::enablePasswordGrant();
 
         // Token expiration settings
-        Passport::tokensExpireIn(now()->addMinutes(10));
-        Passport::refreshTokensExpireIn(now()->addDays(30)); // Refresh token expires in 30 days
-        Passport::personalAccessTokensExpireIn(now()->addMonths(6));
+        Passport::tokensExpireIn(now()->addMinutes(config('passport.access_token_expire_minutes')));
+        Passport::refreshTokensExpireIn(now()->addDays(config('passport.refresh_token_expire_days')));
+        Passport::personalAccessTokensExpireIn(now()->addMonths(config('passport.personal_access_token_expire_months')));
     }
 }

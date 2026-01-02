@@ -2,26 +2,51 @@
 
 namespace App\Services;
 
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Log;
+
+use App\Models\User;
+use App\Models\Merchant;
+use App\Models\Admin;
 
 class AuthService
 {
-    public function register(array $data): array
+    protected array $map = [
+        'user' => [
+            'model' => User::class,
+            'guard' => 'user-api',
+        ],
+        'merchant' => [
+            'model' => Merchant::class,
+            'guard' => 'merchant-api',
+        ],
+        'admin' => [
+            'model' => Admin::class,
+            'guard' => 'admin-api',
+        ],
+    ];
+
+    public function register(array $data, string $role): array
     {
-        $user = User::create([
+        if (!isset($this->map[$role])) {
+            abort(400, 'Invalid role');
+        }
+
+        $modelClass = $this->map[$role]['model'];
+
+        $user = $modelClass::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
 
+        $user->assignRole($role);
+
         $tokenData = $this->issuePasswordToken(
             $user->email,
-            $data['password']
+            $data['password'],
+            $this->map[$role]['guard']
         );
 
         return [
@@ -30,15 +55,26 @@ class AuthService
         ];
     }
 
-    public function login(string $email, string $password): array
+    public function login(string $email, string $password, string $role): array
     {
-        if (!Auth::attempt(compact('email', 'password'))) {
+        $guardData = $this->map[$role] ?? null;
+        if (!$guardData) {
+            abort(400, 'Invalid role');
+        }
+
+        $guard = $guardData['guard'];
+        $modelClass = $guardData['model'];
+
+        $user = $modelClass::where('email', $email)->first();
+        if (!$user || !Hash::check($password, $user->password)) {
             abort(401, 'Invalid credentials');
         }
 
-        $user = User::where('email', $email)->firstOrFail();
+        if (!$user->hasRole($role)) {
+            abort(403, 'Unauthorized role');
+        }
 
-        $tokenData = $this->issuePasswordToken($email, $password);
+        $tokenData = $this->issuePasswordToken($email, $password, $guard);
 
         return [
             'user' => $user,
@@ -46,45 +82,43 @@ class AuthService
         ];
     }
 
-    public function refresh(string $refreshToken): array
+    public function refresh(string $refreshToken, string $guard): array
     {
-        return $this->issueRefreshToken($refreshToken);
+        return $this->issueRefreshToken($refreshToken, $guard);
     }
 
-    public function logout(User $user): void
+    public function logout($user): void
     {
         $token = $user->token();
 
-        if (!$token) {
-            return;
+        if ($token) {
+            $token->revoke();
+
+            DB::table('oauth_refresh_tokens')
+                ->where('access_token_id', $token->id)
+                ->update(['revoked' => true]);
         }
-
-        $token->revoke();
-
-        DB::table('oauth_refresh_tokens')
-            ->where('access_token_id', $token->id)
-            ->update(['revoked' => true]);
     }
 
-    protected function issuePasswordToken(string $email, string $password): array
+    protected function issuePasswordToken(string $email, string $password, string $guard): array
     {
         return $this->callPassport('/oauth/token', [
             'grant_type' => 'password',
-            'client_id' => config('services.passport.password_client_id'),
-            'client_secret' => config('services.passport.password_client_secret'),
+            'client_id' => config("services.passport.{$guard}_client_id"),
+            'client_secret' => config("services.passport.{$guard}_client_secret"),
             'username' => $email,
             'password' => $password,
             'scope' => '',
         ]);
     }
 
-    protected function issueRefreshToken(string $refreshToken): array
+    protected function issueRefreshToken(string $refreshToken, string $guard): array
     {
         return $this->callPassport('/oauth/token', [
             'grant_type' => 'refresh_token',
             'refresh_token' => $refreshToken,
-            'client_id' => config('services.passport.password_client_id'),
-            'client_secret' => config('services.passport.password_client_secret'),
+            'client_id' => config("services.passport.{$guard}_client_id"),
+            'client_secret' => config("services.passport.{$guard}_client_secret"),
             'scope' => '',
         ]);
     }
@@ -93,7 +127,7 @@ class AuthService
     {
         $deviceId = request()->header('X-Device-Id');
 
-        $request = Request::create($uri, 'POST', $payload);
+        $request = request()->create($uri, 'POST', $payload);
 
         if ($deviceId) {
             $request->headers->set('X-Device-Id', $deviceId);
@@ -101,11 +135,14 @@ class AuthService
 
         $response = app()->handle($request);
 
-        if ($response->getStatusCode() !== Response::HTTP_OK) {
-            abort(
-                $response->getStatusCode(),
-                'OAuth token request failed'
-            );
+        if ($response->getStatusCode() !== 200) {
+            Log::error('Passport token request failed', [
+                'payload' => $payload,
+                'status' => $response->getStatusCode(),
+                'body' => $response->getContent(),
+            ]);
+
+            abort($response->getStatusCode(), 'OAuth token request failed');
         }
 
         return json_decode($response->getContent(), true);
