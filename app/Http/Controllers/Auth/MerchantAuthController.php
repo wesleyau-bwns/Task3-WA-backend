@@ -20,7 +20,7 @@ class MerchantAuthController extends Controller
 
         $result = $this->authService->register($validated, 'merchant');
 
-        return $this->tokenResponseWithCookie($result, 'User registered successfully', 201);
+        return $this->tokenResponseWithCookie($result, 'Merchant registered successfully', 201);
     }
 
     public function login(Request $request)
@@ -67,6 +67,21 @@ class MerchantAuthController extends Controller
         );
     }
 
+    public function merchant(Request $request)
+    {
+        $merchant = $request->user();
+
+        return response()->json([
+            'merchant' => [
+                'id' => $merchant->id,
+                'name' => $merchant->name,
+                'email' => $merchant->email,
+                'role' => $merchant->getRoleNames()->first(),
+                'permissions' => $merchant->getAllPermissions()->pluck('name')->toArray(),
+            ],
+        ]);
+    }
+
     /**
      * Send JSON response + refresh token cookie
      */
@@ -80,7 +95,14 @@ class MerchantAuthController extends Controller
         ];
 
         if (isset($data['merchant'])) {
-            $response['merchant'] = $data['merchant'];
+            $merchant = $data['merchant'];
+            $response['merchant'] = [
+                'id' => $merchant->id,
+                'name' => $merchant->name,
+                'email' => $merchant->email,
+                'role' => $merchant->getRoleNames()->first(),
+                'permissions' => $merchant->getAllPermissions()->pluck('name')->toArray(),
+            ];
         }
 
         return response()->json($response, $status)->cookie(

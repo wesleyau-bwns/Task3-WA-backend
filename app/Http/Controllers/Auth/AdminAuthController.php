@@ -20,7 +20,7 @@ class AdminAuthController extends Controller
 
         $result = $this->authService->register($validated, 'admin');
 
-        return $this->tokenResponseWithCookie($result, 'User registered successfully', 201);
+        return $this->tokenResponseWithCookie($result, 'Admin registered successfully', 201);
     }
 
     public function login(Request $request)
@@ -67,6 +67,21 @@ class AdminAuthController extends Controller
         );
     }
 
+    public function admin(Request $request)
+    {
+        $admin = $request->user();
+
+        return response()->json([
+            'admin' => [
+                'id' => $admin->id,
+                'name' => $admin->name,
+                'email' => $admin->email,
+                'role' => $admin->getRoleNames()->first(),
+                'permissions' => $admin->getAllPermissions()->pluck('name')->toArray(),
+            ],
+        ]);
+    }
+
     /**
      * Send JSON response + refresh token cookie
      */
@@ -80,7 +95,14 @@ class AdminAuthController extends Controller
         ];
 
         if (isset($data['admin'])) {
-            $response['admin'] = $data['admin'];
+            $admin = $data['admin'];
+            $response['admin'] = [
+                'id' => $admin->id,
+                'name' => $admin->name,
+                'email' => $admin->email,
+                'role' => $admin->getRoleNames()->first(),
+                'permissions' => $admin->getAllPermissions()->pluck('name')->toArray(),
+            ];
         }
 
         return response()->json($response, $status)->cookie(
@@ -95,4 +117,6 @@ class AdminAuthController extends Controller
             'Lax'
         );
     }
+
+
 }

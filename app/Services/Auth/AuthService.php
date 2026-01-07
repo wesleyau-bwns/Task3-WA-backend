@@ -5,7 +5,6 @@ namespace App\Services\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Spatie\Permission\Models\Role;
 
 use App\Models\User;
 use App\Models\Merchant;
@@ -36,22 +35,22 @@ class AuthService
 
         $modelClass = $this->map[$role]['model'];
 
-        $user = $modelClass::create([
+        $entity = $modelClass::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
 
-        $user->assignRole($role);
+        $entity->assignRole($role);
 
         $tokenData = $this->issuePasswordToken(
-            $user->email,
+            $entity->email,
             $data['password'],
             $this->map[$role]['guard']
         );
 
         return [
-            'user' => $user,
+            $role => $entity,
             'token' => $tokenData,
         ];
     }
@@ -66,19 +65,19 @@ class AuthService
         $guard = $guardData['guard'];
         $modelClass = $guardData['model'];
 
-        $user = $modelClass::where('email', $email)->first();
-        if (!$user || !Hash::check($password, $user->password)) {
+        $entity = $modelClass::where('email', $email)->first();
+        if (!$entity || !Hash::check($password, $entity->password)) {
             abort(401, 'Invalid credentials');
         }
 
-        if (!$user->hasRole($role)) {
+        if (!$entity->hasRole($role)) {
             abort(403, 'Unauthorized role');
         }
 
         $tokenData = $this->issuePasswordToken($email, $password, $guard);
 
         return [
-            'user' => $user,
+            $role => $entity,
             'token' => $tokenData,
         ];
     }
@@ -88,9 +87,9 @@ class AuthService
         return $this->issueRefreshToken($refreshToken, $guard);
     }
 
-    public function logout($user): void
+    public function logout($entity): void
     {
-        $token = $user->token();
+        $token = $entity->token();
 
         if ($token) {
             $token->revoke();

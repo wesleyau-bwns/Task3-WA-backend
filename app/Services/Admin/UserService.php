@@ -3,14 +3,17 @@
 namespace App\Services\Admin;
 
 use App\Models\User;
+
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class UserService
 {
     public function listUsers(): Collection
     {
-        return User::all();
+        return User::where('deleted', 0)->get();
     }
 
     public function getUser(int $id): ?User
@@ -20,17 +23,43 @@ class UserService
 
     public function updateUser(User $user, array $data): User
     {
-        if (isset($data['password']) && empty($data['password'])) {
-            unset($data['password']);
+        if (isset($data['password'])) {
+            if (empty($data['password'])) {
+                unset($data['password']);
+            } else {
+                $data['password'] = Hash::make($data['password']);
+            }
         }
 
-        $user->update($data);
+        $original = $user->getOriginal();
+        $user->update($data); 
+        $changes = $user->getChanges();
+
+        activity()
+        ->causedBy(Auth::user())
+        ->performedOn($user)
+        ->withProperties([
+            'old' => array_intersect_key($original, $changes), // only the fields that changed
+            'new' => $changes
+        ])
+        ->log('updated user');
+
         return $user;
     }
 
     public function deleteUser(User $user): bool
     {
-        return $user->delete();
+        $user->deleted = 1;
+        $user->deleted_at = now();
+        $user->save();
+
+        activity()
+        ->causedBy(Auth::user())
+        ->performedOn($user)
+        ->withProperties(['name' => $user->name, 'email' => $user->email])
+        ->log('deleted user');
+
+        return true;
     }
 
     /**
@@ -41,7 +70,7 @@ class UserService
      */
     public function paginateUsers(array $params): LengthAwarePaginator
     {
-        $query = User::query();
+        $query = User::where('deleted', 0);
 
         // Search 
         if (!empty($params['search'])) {

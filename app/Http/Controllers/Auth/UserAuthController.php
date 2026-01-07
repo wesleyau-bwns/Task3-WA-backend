@@ -67,6 +67,21 @@ class UserAuthController extends Controller
         );
     }
 
+    public function user(Request $request)
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->getRoleNames()->first(),
+                'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
+            ],
+        ]);
+    }
+
     /**
      * Send JSON response + refresh token cookie
      */
@@ -80,7 +95,14 @@ class UserAuthController extends Controller
         ];
 
         if (isset($data['user'])) {
-            $response['user'] = $data['user'];
+            $user = $data['user'];
+            $response['user'] = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->getRoleNames()->first(),
+                'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
+            ];
         }
 
         return response()->json($response, $status)->cookie(
