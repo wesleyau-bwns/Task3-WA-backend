@@ -16,10 +16,11 @@ class UsersTableSeeder extends Seeder
             'guard_name' => 'user-api'
         ]);
 
-        $user = User::firstOrCreate(
-            ['email' => 'user@example.com'],
-            ['name' => 'Regular User', 'password' => Hash::make('password123')]
-        );
+        $user = User::create([
+            'name' => 'Basic User',
+            'email' => 'user@example.com',
+            'password' => Hash::make('password123'),
+        ]);
 
         $user->assignRole($role);
     }

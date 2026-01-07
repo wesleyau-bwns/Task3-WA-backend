@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Services\AuthService;
+use App\Services\Auth\AuthService;
 use Illuminate\Http\Request;
 
 class MerchantAuthController extends Controller
@@ -54,7 +54,7 @@ class MerchantAuthController extends Controller
     {
         $this->authService->logout($request->user('merchant-api'));
 
-        return response()->json(['message' => 'Logged out'])->cookie(
+        return response()->json(['message' => 'Logged out successfully'])->cookie(
             'refresh_token',
             '',
             -1,

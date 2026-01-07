@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Auth;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Role;
 
 use App\Models\User;
 use App\Models\Merchant;

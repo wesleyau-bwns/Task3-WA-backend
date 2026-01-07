@@ -12,12 +12,7 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        // Return null for API requests to prevent redirect
-        if ($request->expectsJson() || $request->is('api/*')) {
-            return null;
-        }
-
-        return route('login');
+        return null;
     }
 
     /**
@@ -25,13 +20,9 @@ class Authenticate extends Middleware
      */
     protected function unauthenticated($request, array $guards)
     {
-        if ($request->expectsJson() || $request->is('api/*')) {
-            abort(response()->json([
-                'message' => 'Unauthenticated. Please provide a valid access token.',
-                'error' => 'unauthorized'
-            ], 401));
-        }
-
-        parent::unauthenticated($request, $guards);
+        abort(response()->json([
+            'message' => 'Unauthenticated. Please provide a valid access token.',
+            'error' => 'unauthorized',
+        ], 401));
     }
 }
