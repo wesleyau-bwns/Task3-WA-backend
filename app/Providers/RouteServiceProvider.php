@@ -37,17 +37,17 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/web.php'));
 
             Route::middleware('api')
-                ->domain('api-user.bpsp.com')
+                ->domain('bpsp-api-user.bw-group.cc')
                 ->prefix('v1')
                 ->group(base_path('routes/v1/user.php'));
 
             Route::middleware('api')
-                ->domain('api-merchant.bpsp.com')
+                ->domain('bpsp-api-merchant.bw-group.cc')
                 ->prefix('v1')
                 ->group(base_path('routes/v1/merchant.php'));
 
             Route::middleware('api')
-                ->domain('api-admin.bpsp.com')
+                ->domain('bpsp-api-admin.bw-group.cc')
                 ->prefix('v1')
                 ->group(base_path('routes/v1/admin.php'));
         });

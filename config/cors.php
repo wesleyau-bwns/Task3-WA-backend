@@ -15,11 +15,11 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'oauth/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'v1/*', 'oauth/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:3000'],
+    'allowed_origins' => ['http://localhost:3000', 'https://bpsp-admin.bw-group.cc', 'https://bpsp-merchant.bw-group.cc', 'https://bpsp-user.bw-group.cc'],
 
     'allowed_origins_patterns' => [],
 
