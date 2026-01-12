@@ -73,12 +73,19 @@ class MerchantAuthController extends Controller
 
         return response()->json([
             'merchant' => [
-                'id' => $merchant->id,
                 'name' => $merchant->name,
                 'email' => $merchant->email,
-                'role' => $merchant->getRoleNames()->first(),
-                'permissions' => $merchant->getAllPermissions()->pluck('name')->toArray(),
             ],
+        ]);
+    }
+
+    
+    public function permissions(Request $request)
+    {
+        $merchant = $request->user();
+
+        return response()->json([
+            'permissions' => $merchant->getAllPermissions()->pluck('name')->toArray(),
         ]);
     }
 
@@ -97,11 +104,8 @@ class MerchantAuthController extends Controller
         if (isset($data['merchant'])) {
             $merchant = $data['merchant'];
             $response['merchant'] = [
-                'id' => $merchant->id,
                 'name' => $merchant->name,
                 'email' => $merchant->email,
-                'role' => $merchant->getRoleNames()->first(),
-                'permissions' => $merchant->getAllPermissions()->pluck('name')->toArray(),
             ];
         }
 

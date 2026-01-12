@@ -73,12 +73,18 @@ class AdminAuthController extends Controller
 
         return response()->json([
             'admin' => [
-                'id' => $admin->id,
                 'name' => $admin->name,
                 'email' => $admin->email,
-                'role' => $admin->getRoleNames()->first(),
-                'permissions' => $admin->getAllPermissions()->pluck('name')->toArray(),
             ],
+        ]);
+    }
+
+    public function permissions(Request $request)
+    {
+        $admin = $request->user();
+
+        return response()->json([
+            'permissions' => $admin->getAllPermissions()->pluck('name')->toArray(),
         ]);
     }
 
@@ -97,11 +103,8 @@ class AdminAuthController extends Controller
         if (isset($data['admin'])) {
             $admin = $data['admin'];
             $response['admin'] = [
-                'id' => $admin->id,
                 'name' => $admin->name,
                 'email' => $admin->email,
-                'role' => $admin->getRoleNames()->first(),
-                'permissions' => $admin->getAllPermissions()->pluck('name')->toArray(),
             ];
         }
 
@@ -117,6 +120,4 @@ class AdminAuthController extends Controller
             'Lax'
         );
     }
-
-
 }

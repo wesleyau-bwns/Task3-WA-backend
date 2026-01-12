@@ -13,6 +13,7 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:admin-api')->group(function () {
         Route::post('/logout', [AdminAuthController::class, 'logout']);
         Route::get('/admin', [AdminAuthController::class, 'admin']);
+        Route::get('/permissions', [AdminAuthController::class, 'permissions']);
     });
 });
 

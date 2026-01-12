@@ -73,12 +73,18 @@ class UserAuthController extends Controller
 
         return response()->json([
             'user' => [
-                'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'role' => $user->getRoleNames()->first(),
-                'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
             ],
+        ]);
+    }
+
+    public function permissions(Request $request)
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
         ]);
     }
 
@@ -97,11 +103,8 @@ class UserAuthController extends Controller
         if (isset($data['user'])) {
             $user = $data['user'];
             $response['user'] = [
-                'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'role' => $user->getRoleNames()->first(),
-                'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
             ];
         }
 

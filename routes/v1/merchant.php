@@ -11,5 +11,6 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:merchant-api')->group(function () {
         Route::post('/logout', [MerchantAuthController::class, 'logout']);
         Route::get('/merchant', [MerchantAuthController::class, 'merchant']);
+        Route::get('/permissions', [MerchantAuthController::class, 'permissions']);
     });
 });
