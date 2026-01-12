@@ -4,9 +4,12 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Traits\PasswordRules;
 
 class UpdateUserRequest extends FormRequest
 {
+    use PasswordRules;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -32,7 +35,7 @@ class UpdateUserRequest extends FormRequest
                 'email',
                 Rule::unique('users', 'email')->ignore($userId),
             ],
-            'password' => 'nullable|string|min:8|confirmed',
+            'password' => $this->optionalPasswordRules(),
         ];
     }
 }

@@ -50,7 +50,7 @@ class UserService
                 ->causedBy(Auth::user())
                 ->performedOn($user)
                 ->withProperties([
-                    'old' => array_intersect_key($original, $changes), // only the fields that changed
+                    'old' => array_intersect_key($original, $changes), // only changed fields
                     'new' => $changes
                 ])
                 ->log('updated user');

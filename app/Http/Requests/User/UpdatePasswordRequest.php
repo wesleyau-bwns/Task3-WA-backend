@@ -1,39 +1,37 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Traits\PasswordRules;
 
 class UpdatePasswordRequest extends FormRequest
 {
+    use PasswordRules;
+
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
-        // Only authenticated users can update their password
         return auth()->check();
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
     public function rules(): array
     {
         return [
             'current_password' => ['required', 'string'],
-            'new_password' => [
-                'required',
-                'string',
-                'min:8',              // Minimum length
-                'confirmed',          // Requires `new_password_confirmation` to match
-                'regex:/[a-z]/',      // At least one lowercase letter
-                'regex:/[A-Z]/',      // At least one uppercase letter
-                'regex:/[0-9]/',      // At least one number
-                'regex:/[@$!%*#?&]/', // At least one special character
-            ],
+            'new_password' => $this->requiredPasswordRules(),
         ];
     }
 
-    /**
-     * Custom validation after rules run
-     */
     protected function passedValidation()
     {
         $user = $this->user();
