@@ -22,8 +22,19 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'email',
-        'password',
+        'username',
+        'phone_country_code',
+        'phone_number',
+        'avatar',
+        'date_of_birth',
+        'country',
+        'address_line1',
+        'address_line2',
+        'city',
+        'state',
+        'postal_code',
+        'language',
+        'timezone',
     ];
 
     /**
@@ -44,5 +55,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'date_of_birth' => 'date',
+        'last_login_at' => 'datetime',
+        'two_factor_enabled' => 'boolean',
     ];
 }

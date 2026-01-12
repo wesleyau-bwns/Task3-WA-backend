@@ -13,7 +13,7 @@ class UserService
 {
     public function listUsers(): Collection
     {
-        return User::where('deleted', 0)->get();
+        return User::where('account_status', 'active')->get();
     }
 
     public function getUser(int $id): ?User
@@ -32,32 +32,31 @@ class UserService
         }
 
         $original = $user->getOriginal();
-        $user->update($data); 
+        $user->update($data);
         $changes = $user->getChanges();
 
         activity()
-        ->causedBy(Auth::user())
-        ->performedOn($user)
-        ->withProperties([
-            'old' => array_intersect_key($original, $changes), // only the fields that changed
-            'new' => $changes
-        ])
-        ->log('updated user');
+            ->causedBy(Auth::user())
+            ->performedOn($user)
+            ->withProperties([
+                'old' => array_intersect_key($original, $changes), // only the fields that changed
+                'new' => $changes
+            ])
+            ->log('updated user');
 
         return $user;
     }
 
     public function deleteUser(User $user): bool
     {
-        $user->deleted = 1;
-        $user->deleted_at = now();
+        $user->account_status = "closed";
         $user->save();
 
         activity()
-        ->causedBy(Auth::user())
-        ->performedOn($user)
-        ->withProperties(['name' => $user->name, 'email' => $user->email])
-        ->log('deleted user');
+            ->causedBy(Auth::user())
+            ->performedOn($user)
+            ->withProperties(['name' => $user->name, 'email' => $user->email])
+            ->log('closed user account');
 
         return true;
     }
@@ -70,7 +69,7 @@ class UserService
      */
     public function paginateUsers(array $params): LengthAwarePaginator
     {
-        $query = User::where('deleted', 0);
+        $query = User::where('account_status', 'active');
 
         // Search 
         if (!empty($params['search'])) {

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\UserAuthController;
+use App\Http\Controllers\User\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -13,4 +14,10 @@ Route::prefix('auth')->group(function () {
         Route::get('/user', [UserAuthController::class, 'user']);
         Route::get('/permissions', [UserAuthController::class, 'permissions']);
     });
+});
+
+Route::prefix('api')->middleware('auth:user-api')->group(function () {
+    Route::get('/user/profile', [UserController::class, 'show']);
+    Route::put('/user/profile', [UserController::class, 'updateProfile']);
+    Route::put('/user/password', [UserController::class, 'updatePassword']);
 });
