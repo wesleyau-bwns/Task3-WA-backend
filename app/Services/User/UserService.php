@@ -7,6 +7,10 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
+use Intervention\Image\Laravel\Facades\Image;
 
 class UserService
 {
@@ -18,10 +22,14 @@ class UserService
     public function updateProfile(User $user, array $data): User
     {
         return DB::transaction(function () use ($user, $data) {
-
             // Prevent updates if account is not active
             if ($user->account_status !== 'active') {
                 throw new \Exception('Account is not active.');
+            }
+
+            // Handle avatar upload separately
+            if (isset($data['avatar']) && $data['avatar'] instanceof \Illuminate\Http\UploadedFile) {
+                $data['avatar'] = $this->handleAvatarUpload($user, $data['avatar']);
             }
 
             // Update only allowed fields
@@ -79,5 +87,23 @@ class UserService
         }
 
         return $user->fresh();
+    }
+
+    private function handleAvatarUpload(User $user, \Illuminate\Http\UploadedFile $upload): string
+    {
+        try {
+            // Resize image (300x300 max)
+            $image = Image::read($upload)->resize(300, 300);
+            $encodedImage =  $image->encodeByExtension($upload->getClientOriginalExtension(), quality: 70);
+
+            // Save to storage/app/public/profile
+            $filename = "public/profile/" . Str::random() . '.' . $upload->getClientOriginalExtension();
+            Storage::put($filename, $encodedImage);
+
+            $publicUrl = config('app.url') . Storage::url($filename);
+            return $publicUrl;
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 }

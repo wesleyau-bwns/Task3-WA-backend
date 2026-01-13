@@ -18,6 +18,6 @@ Route::prefix('auth')->group(function () {
 
 Route::prefix('api')->middleware('auth:user-api')->group(function () {
     Route::get('/user/profile', [UserController::class, 'show']);
-    Route::put('/user/profile', [UserController::class, 'updateProfile']);
+    Route::post('/user/profile', [UserController::class, 'updateProfile']);
     Route::put('/user/password', [UserController::class, 'updatePassword']);
 });

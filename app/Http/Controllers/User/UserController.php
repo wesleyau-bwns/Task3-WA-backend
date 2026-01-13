@@ -8,6 +8,7 @@ use App\Http\Requests\User\UpdatePasswordRequest;
 use App\Services\User\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -26,14 +27,21 @@ class UserController extends Controller
     public function updateProfile(UpdateUserRequest $request): JsonResponse
     {
         $user = Auth::user();
-        $updatedUser = $this->userService->updateProfile($user, $request->validated());
+
+        // Get all validated fields except files
+        $data = $request->validated();
+
+        // Handle avatar file separately
+        if ($request->hasFile('avatar')) {
+            $avatarFile = $request->file('avatar');
+            $data['avatar'] = $avatarFile;
+        }
+
+        $updatedUser = $this->userService->updateProfile($user, $data);
 
         return $this->success('Profile updated successfully', $updatedUser);
     }
 
-    /**
-     * Update authenticated user password.
-     */
     public function updatePassword(UpdatePasswordRequest $request): JsonResponse
     {
         $user = Auth::user();

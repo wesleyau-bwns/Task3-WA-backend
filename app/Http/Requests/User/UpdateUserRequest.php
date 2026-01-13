@@ -26,7 +26,7 @@ class UpdateUserRequest extends FormRequest
             'username' => 'sometimes|string|max:50|unique:users,username,' . $this->user()->id,
             'phone_country_code' => 'sometimes|string|max:5',
             'phone_number' => 'sometimes|string|max:20',
-            'avatar' => 'sometimes|url',
+            'avatar' => 'sometimes|file|image|mimes:jpg,jpeg,png|max:2048',
 
             'date_of_birth' => 'sometimes|date|before:today',
             'country' => 'sometimes|string|size:2',

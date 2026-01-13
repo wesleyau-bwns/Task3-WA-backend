@@ -75,6 +75,7 @@ class UserAuthController extends Controller
             'user' => [
                 'name' => $user->name,
                 'email' => $user->email,
+                'avatar' => $user->avatar,
             ],
         ]);
     }
@@ -105,6 +106,7 @@ class UserAuthController extends Controller
             $response['user'] = [
                 'name' => $user->name,
                 'email' => $user->email,
+                'avatar' => $user->avatar,
             ];
         }
 
