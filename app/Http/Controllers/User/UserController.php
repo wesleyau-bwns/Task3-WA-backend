@@ -20,38 +20,25 @@ class UserController extends Controller
         $user = Auth::user();
         $profile = $this->userService->getProfile($user);
 
-        return response()->json([
-            'data' => $profile
-        ]);
+        return $this->success('Profile retrieved successfully', $profile);
     }
 
     public function updateProfile(UpdateUserRequest $request): JsonResponse
     {
         $user = Auth::user();
+        $updatedUser = $this->userService->updateProfile($user, $request->validated());
 
-        $updatedUser = $this->userService->updateProfile(
-            $user,
-            $request->validated()
-        );
-
-        return response()->json([
-            'message' => 'Profile updated successfully',
-            'data' => $updatedUser,
-        ]);
+        return $this->success('Profile updated successfully', $updatedUser);
     }
 
+    /**
+     * Update authenticated user password.
+     */
     public function updatePassword(UpdatePasswordRequest $request): JsonResponse
     {
         $user = Auth::user();
-
         $updatedUser = $this->userService->updatePassword($user, $request->validated());
 
-        return response()->json([
-            'message' => 'Password updated successfully',
-            'data' => [
-                'id' => $updatedUser->id,
-                'updated_at' => $updatedUser->updated_at,
-            ],
-        ]);
+        return $this->success('Password updated successfully', $updatedUser);
     }
 }
