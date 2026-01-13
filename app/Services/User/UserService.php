@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -72,7 +71,7 @@ class UserService
     public function updatePassword(User $user, array $data): User
     {
         if (isset($data['new_password'])) {
-            $user->password = Hash::make($data['new_password']);
+            $user->password = $data['new_password'];
             $original = $user->getOriginal();
             $user->save();
 

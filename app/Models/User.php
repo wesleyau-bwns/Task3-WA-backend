@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -11,7 +10,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasRoles, HasFactory, Notifiable;
+    use HasApiTokens, HasRoles, Notifiable;
 
     protected string $guard_name = 'user-api';
 
@@ -23,6 +22,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'username',
+        'email',
+        'password',
         'phone_country_code',
         'phone_number',
         'avatar',

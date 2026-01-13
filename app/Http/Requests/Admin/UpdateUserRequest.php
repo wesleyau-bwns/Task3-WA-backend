@@ -38,4 +38,15 @@ class UpdateUserRequest extends FormRequest
             'password' => $this->optionalPasswordRules(),
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'password.confirmed' => 'The password confirmation does not match.',
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.regex' => 'Password must include uppercase, lowercase, number, and special character.',
+            'email.unique' => 'This email is already taken.',
+            'name.required' => 'Name is required.',
+        ];
+    }
 }

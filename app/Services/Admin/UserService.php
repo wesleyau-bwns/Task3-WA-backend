@@ -5,8 +5,8 @@ namespace App\Services\Admin;
 use App\Models\User;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class UserService
@@ -23,12 +23,8 @@ class UserService
 
     public function updateUser(User $user, array $data): User
     {
-        if (isset($data['password'])) {
-            if (empty($data['password'])) {
-                unset($data['password']);
-            } else {
-                $data['password'] = Hash::make($data['password']);
-            }
+        if (isset($data['password']) && empty($data['password'])) {
+            unset($data['password']);
         }
 
         $original = $user->getOriginal();
