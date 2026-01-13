@@ -32,7 +32,7 @@ class UpdateUserRequest extends FormRequest
             'country' => 'sometimes|string|size:2',
 
             'address_line1' => 'sometimes|string|max:255',
-            'address_line2' => 'nullable|string|max:255',
+            'address_line2' => 'sometimes|string|max:255',
             'city' => 'sometimes|string|max:100',
             'state' => 'sometimes|string|max:100',
             'postal_code' => 'sometimes|string|max:20',

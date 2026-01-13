@@ -8,7 +8,6 @@ use App\Http\Requests\User\UpdatePasswordRequest;
 use App\Services\User\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {

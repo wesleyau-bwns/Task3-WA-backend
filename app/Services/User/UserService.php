@@ -4,11 +4,13 @@ namespace App\Services\User;
 
 use App\Models\User;
 
+use Illuminate\Support\Str;
+use Illuminate\Http\UploadedFile;
+
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 use Intervention\Image\Laravel\Facades\Image;
 
@@ -89,17 +91,24 @@ class UserService
         return $user->fresh();
     }
 
-    private function handleAvatarUpload(User $user, \Illuminate\Http\UploadedFile $upload): string
+    private function handleAvatarUpload(User $user, UploadedFile $upload): string
     {
         try {
-            // Resize image (300x300 max)
+            // Process the image to save storage space
             $image = Image::read($upload)->resize(300, 300);
             $encodedImage =  $image->encodeByExtension($upload->getClientOriginalExtension(), quality: 70);
 
             // Save to storage/app/public/profile
-            $filename = "public/profile/" . Str::random() . '.' . $upload->getClientOriginalExtension();
-            Storage::put($filename, $encodedImage);
+            $filename = "profile/" . Str::random() . '.' . $upload->getClientOriginalExtension();
+            Storage::disk('public')->put($filename, $encodedImage);
 
+            // Delete old avatar if exists
+            if ($user->avatar) {
+                $relativePath = str_replace(config('app.url') . '/storage/', '', $user->avatar);
+                Storage::disk('public')->delete($relativePath);
+            }
+
+            // Generate the public URL
             $publicUrl = config('app.url') . Storage::url($filename);
             return $publicUrl;
         } catch (\Exception $e) {
