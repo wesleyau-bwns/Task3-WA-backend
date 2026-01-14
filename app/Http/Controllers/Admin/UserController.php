@@ -6,14 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Models\User;
 use App\Services\Admin\UserService;
+
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function __construct(
-        protected UserService $userService
-    ) {}
+    public function __construct(protected UserService $userService) {}
 
     public function index(Request $request): JsonResponse
     {

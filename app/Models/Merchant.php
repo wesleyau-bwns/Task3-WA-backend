@@ -21,6 +21,7 @@ class Merchant extends Authenticatable
         'store_name',
         'store_description',
         'status',
+        'last_login_at'
     ];
 
     protected $hidden = [
@@ -31,5 +32,6 @@ class Merchant extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'last_login_at' => 'datetime',
     ];
 }

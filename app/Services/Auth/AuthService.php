@@ -74,6 +74,9 @@ class AuthService
             abort(403, 'Unauthorized role');
         }
 
+        $entity->last_login_at = now();
+        $entity->save();
+
         $tokenData = $this->issuePasswordToken($email, $password, $guard);
 
         return [

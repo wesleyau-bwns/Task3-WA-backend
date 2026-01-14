@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\User\BankAccountController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -17,7 +18,11 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('api')->middleware('auth:user-api')->group(function () {
+    // Profile
     Route::get('/user/profile', [UserController::class, 'show']);
     Route::post('/user/profile', [UserController::class, 'updateProfile']);
     Route::put('/user/password', [UserController::class, 'updatePassword']);
+
+    // Bank Account
+    Route::apiResource('bank-accounts', BankAccountController::class);
 });

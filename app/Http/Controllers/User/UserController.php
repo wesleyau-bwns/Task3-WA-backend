@@ -6,14 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Requests\User\UpdatePasswordRequest;
 use App\Services\User\UserService;
+
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    public function __construct(
-        protected UserService $userService
-    ) {}
+    public function __construct(protected UserService $userService) {}
 
     public function show(): JsonResponse
     {
